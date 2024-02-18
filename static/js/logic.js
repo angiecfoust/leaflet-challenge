@@ -6,11 +6,27 @@ d3.json(url).then(function (data) {
     createFeatures(data.features);
 });
 
-function createFeatures(earthquakeData) {
 
-    // Define a function that we want to run once for each feature in the features array.
-    // Give each feature a popup that describes the place and time of the earthquake.
-    function onEachFeature(feature, layer) {
+function createFeatures(earthquakeData) {
+    //define array to hold markers
+    let markers = [];
+
+    //loop through data and create markers- size based on magnitude, color based on depth
+    for (let i=0; i < data.features.length; i++) {
+    let location = data.features[i].geometry;
+    markers.push(
+        L.circle([location.coordinates[1], location.coordinates[0]], {
+            stroke: false,
+            fillOpacity: location.properties.mag,
+            color: "aqua",
+            fillColor: "aqua",
+            radius: location.coordinates[2]
+        })
+    )};
+
+    // Define a function that we want to run once for each feature in the markers array.
+    // Give each marker a popup that describes the place and time of the earthquake.
+    function onEachMarker(markers, layer) {
       layer.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`);
     }
   
@@ -22,7 +38,12 @@ function createFeatures(earthquakeData) {
   
     // Send our earthquakes layer to the createMap function/
     createMap(earthquakes);
-  }
+}
+
+
+
+//create layer group for markers
+//let markerGroup = L.layerGroup(markers);
   
   function createMap(earthquakes) {
   
