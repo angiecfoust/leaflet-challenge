@@ -1,4 +1,12 @@
-  //create baseMaps
+    //create map
+    let myMap = L.map("map", {
+      center: [
+        37.09, -95.71
+      ],
+      zoom: 3
+    });
+  
+  //create tile layers
   let streetmap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   });
@@ -12,18 +20,6 @@
     "Topographic Map": topo
   };
 
-  // create overlay maps
-  //let overlayMaps = {
-    //Earthquakes: earthquakes
-  //};
-
-  //create map
-  let myMap = L.map("map", {
-    center: [
-      37.09, -95.71
-    ],
-    zoom: 3,
-  });
 
 // store our endpoint as a variable
 let url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
@@ -59,24 +55,28 @@ function main(features) {
     // set up radius based on magnitude
     let radius = features[i].properties.mag * 5;
 
+    
     //create circle markers
-    L.circle(features.geometry, {
-      color: color,
-      fillColor: color,
-      fillOpacity: 0.75,
-      radius: radius
-    }).bindPopup(`<h3>"Location: "${feature[i].properties.place}</h3><hr><p>"Date: "${new Date(feature[i].properties.time)}</br>
-    "Magnitude: "${feature[i].properties.mag}</p>`).addTo(myMap);
+    var earthquakes = L.geoJson(features, {
+      onEachFeature: (feature, layer) => {
+        L.circle(features.geometry, {
+          color: color,
+          fillColor: color,
+          fillOpacity: 0.75,
+          radius: radius
+        }).bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</br>
+        Magnitude: ${feature.properties.mag}</p>`);
+      }
+    }
+      )};
+    // create overlay maps
+  let overlayMaps = {
+  Earthquakes: earthquakes
+  };
+
+  // add control layer
+  L.control.layers(baseMaps, overlayMaps, {
+    collapsed: false
+  }).addTo(myMap);
   }
 
-
-  //set bindPopup info
-  //let earthquakes = L.geoJson(features, {
-    //onEachFeature: (feature, layer) => {
-      //layer.bindPopup(`<p>"Location: "${feature.properties.place}<br>"Date: "${new Date(feature.properties.time)}<br>
-      //"Magnitude: "<br></p>`);
-    //}
-  //});
-
-
-}
