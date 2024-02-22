@@ -40,7 +40,7 @@ function drawMap(earthquakes) {
     //create map
     let myMap = L.map("map", {
       center: [
-        37.09, -95.71
+        17.96, -67.08
       ],
       zoom: 3,
       layers: [streetmap, earthquakes]
@@ -52,42 +52,54 @@ function drawMap(earthquakes) {
     }).addTo(myMap);
 
     // make a legend
-   let legend = L.control({position: "bottomright"});
+    //set colors for legend labels (match colors to marker colors)
+    function getColor(d) {
+      return d > 45 ? "#4A235A" :
+             d > 35 ? "#6C3483" :
+             d > 25 ? "#8E44AD" :
+             d > 15 ? "#BB8FCE" :
+             d > 5 ? "#E8DAEF" :
+                     "#F4ECF7";   
+   } 
+
+   let legend = L.control({position: 'bottomright'});
    legend.onAdd = function (myMap) {
-    let div = L.DomUtil.create("div", "info legend");
-    grades = [-5, 5, 15, 25, 35, 45]
+    let div = L.DomUtil.create('div', 'info legend'),
+    grades = [45, 35, 25, 15, 5, -5],
     labels = [];
-    for (let i = 0; i < categories.length; i++) {
+
+    //loop through intervals to generate labels
+    for (let i = 0; i < grades.length; i++) {
       div.innerHTML +=
-      labels.push(
-        "<i style="background:" + setColor(depth));
+        '<i style="background:' + getColor(grades[i] + 1) + '"></i>' +
+        grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
     }
-    div.innerHTML = labels.join('<br>');
     return div;
    };
+
    legend.addTo(myMap);
 
 }
 
 
-// set up color function/conditional based on depth
+// set up color function/conditional based on depth for the markers
 function setColor(depth) {
-    let color = "";
-    //let depth = features[1].geometry.coordinates[2]; //this may need to be defined elsewhere
-    if (depth > 45) 
-      color = "#4A235A";
-    else if (depth > 35) 
-      color = "#6C3483";
-    else if (depth > 25) 
-      color = "#8E44AD";
-    else if (depth > 15) 
-      color = "#BB8FCE";
-    else if (depth > 5) 
-      color = "#E8DAEF";
-    else if (depth > -5)
-      color = "#F4ECF7"
-    return color;
- } 
+  let color = "";
+  
+  if (depth > 45) 
+    color = "#4A235A";
+  else if (depth > 35) 
+    color = "#6C3483";
+  else if (depth > 25) 
+    color = "#8E44AD";
+  else if (depth > 15) 
+    color = "#BB8FCE";
+  else if (depth > 5) 
+    color = "#E8DAEF";
+  else if (depth > -5)
+    color = "#F4ECF7"
+  return color;
+} 
 
 
 // create features function (note to me- see 'oneach' in activity 3.10)
